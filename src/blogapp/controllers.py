@@ -1,4 +1,4 @@
-from src.blogapp.dtos  import BlogResponseSchema , BlogSchema , UpdateBlogSchema
+from src.blogapp.dtos  import BlogResponseSchema , BlogSchema , UpdateBlogSchema , PatchBlogSchema
 from sqlalchemy.orm import Session
 from src.blogapp.models import BlogModel
 from fastapi.templating import Jinja2Templates
@@ -42,26 +42,45 @@ def get_blog(request:Request ,blog_id:int , db:Session):
     
 
 
-def update_blog(blog:UpdateBlogSchema , db:Session):
-
+def update_blog_fully(blog_id:int , blog:UpdateBlogSchema , db:Session):
     data = blog.model_dump()
-
-    is_blog = db.query(BlogModel).filter(BlogModel.id == data["id"]).first()
+    is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
 
     if not is_blog:
-        return {"the blog with this id not exist"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Page not found")
 
+    is_user = db.query(BlogModel).filter(BlogModel.user_id == data['user_id']).first()
 
+    if not is_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="there is no user with this id")
 
-    is_blog.author = data["author"]
-    is_blog.title = data["title"]
-    is_blog.content = data["content"]
-    is_blog.date_published = data["date_published"]
+    is_blog.user_id = data['user_id']
+    is_blog.title = data['title']
+    is_blog.content = data['content']
 
     db.commit()
     db.refresh(is_blog)
 
-    return {"msg":"task updated successfully" , "updated":is_blog}
+    return is_blog
+
+
+def update_blog_partially(blog_id:int , blog:PatchBlogSchema , db:Session):
+    
+    is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+
+    if not is_blog:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Page not found")
+
+    data = blog.model_dump(exclude_unset=True)
+
+    for field , value in data.items():
+        setattr(is_blog , field , value)
+
+
+    db.commit()
+    db.refresh(is_blog)
+
+    return is_blog
 
 
 def delete_blog(blog_id:int , db:Session):
@@ -69,12 +88,12 @@ def delete_blog(blog_id:int , db:Session):
     is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
 
     if not is_blog:
-        return {"your blog id in invalid"}
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="blog not found")
 
     db.delete(is_blog)
     db.commit()
 
-    return {"msg":"blog deleted successfully"}
+    return None
 
 
 
@@ -89,3 +108,8 @@ def user_blog_page(request ,user_id:int , db:Session):
 
     return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":result , "user":user , "title":f"{user.username}blog's"} )
 
+
+
+def get_all_blogs(db:Session):
+    all_blogs = db.query(BlogModel).all()
+    return all_blogs

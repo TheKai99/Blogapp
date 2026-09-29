@@ -1,6 +1,6 @@
-from fastapi import APIRouter , Depends
+from fastapi import APIRouter , Depends , status
 from src.user import controllers
-from src.user.dtos import UserSchema , UserResponseSchema
+from src.user.dtos import UserSchema , UserResponseSchema , UserUpdateSchema
 from sqlalchemy.orm import Session
 from src.utils.db import get_db
 
@@ -15,6 +15,16 @@ user_routes = APIRouter(prefix="/user")
 def create_user(data:UserSchema , db:Session = Depends(get_db)):
     return controllers.create_user(data , db)
 
-@user_routes.get("/get_user/{user_id}" , response_model=UserResponseSchema)
+@user_routes.get("/{user_id}" , response_model=UserResponseSchema)
 def get_user(user_id:int , db:Session = Depends(get_db)):
     return controllers.get_user(user_id , db)
+
+@user_routes.patch("/{user_id}")
+def update_user(user_id:int , data:UserUpdateSchema , db:Session = Depends(get_db)):
+    return controllers.update_user(user_id , data , db)
+
+
+#delete the user
+@user_routes.delete("/delete/{user_id}" , status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id:int , db:Session = Depends(get_db)):
+    controllers.delete_user(user_id , db)

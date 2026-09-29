@@ -30,8 +30,12 @@ class BlogResponseSchema(BaseModel):
 
 class UpdateBlogSchema(BaseModel):
 
-    id:int
-    author:str
+    user_id:int
     title:str
     content:str
-    date_published: datetime = Field(default_factory=datetime.now)
+
+
+class PatchBlogSchema(BaseModel):
+
+    title:str
+    content:str

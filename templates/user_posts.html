@@ -10,7 +10,7 @@
         <div class="card-body d-flex align-items-center">
 
             <img
-                src="{{ url_for('static', path='profile_pics/profile.jpg') }}"
+                src="{{ user.image_path }}"
                 class="rounded-circle me-3"
                 width="80"
                 height="80"
@@ -43,7 +43,7 @@
                     <div class="d-flex align-items-center mb-3">
 
                         <img
-                            src="{{ url_for('static', path='profile_pics/profile.jpg') }}"
+                            src="{{ blog.author.image_path }}"
                             class="rounded-circle me-3"
                             width="50"
                             height="50"

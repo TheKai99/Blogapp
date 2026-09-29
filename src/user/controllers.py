@@ -1,7 +1,7 @@
 from fastapi import HTTPException ,status
 from sqlalchemy.orm import Session
 from src.user.models import UserModel
-from src.user.dtos import UserSchema
+from src.user.dtos import UserSchema , UserUpdateSchema
 
 
 
@@ -48,3 +48,31 @@ def get_user(user_id:int , db:Session):
 
 
     return is_user
+
+def update_user(user_id , data:UserUpdateSchema , db:Session):
+
+    is_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+
+    if not is_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    user_data = data.model_dump(exclude_unset=True)
+
+    for field , value in user_data.items():
+        setattr(is_user , field , value)
+
+
+    db.commit()
+    db.refresh(is_user)
+    return is_user
+
+def delete_user(user_id:int , db:Session):
+    is_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+
+    if not is_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="there is no user with this id")
+
+    db.delete(is_user)
+    db.commit()
+
+    return None
