@@ -6,10 +6,22 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as starletteHTTPException
 from fastapi.templating import Jinja2Templates
 from src.user.routers import user_routes
+from contextlib import asynccontextmanager
 
-Base.metadata.create_all(engine)
+@asynccontextmanager
+async def lifespan(_app:FastAPI):
 
-app = FastAPI()
+    #startup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
+    #shutdown
+    await engine.dispose()
+
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static" ,StaticFiles(directory="static") , name="static")
 app.mount("/media" ,StaticFiles(directory="media") , name="media")
@@ -19,12 +31,6 @@ templates = Jinja2Templates(directory="templates")
 
 app.include_router(blog_routes)
 app.include_router(user_routes)
-
-
-
-@app.get("/")
-def check():
-    return {"done"}
 
 
 

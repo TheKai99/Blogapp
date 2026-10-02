@@ -1,21 +1,26 @@
 from fastapi import HTTPException ,status
 from sqlalchemy.orm import Session
 from src.user.models import UserModel
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from src.user.dtos import UserSchema , UserUpdateSchema
 
 
 
 
-def create_user(data:UserSchema , db:Session):
+async def create_user(data:UserSchema , db:AsyncSession):
 
     user_data = data.model_dump()
 
-    is_user = db.query(UserModel).filter(UserModel.username == user_data["username"]).first()
-
+    result = await db.execute(select(UserModel).where(UserModel.username == user_data["username"]))
+    is_user = result.scalar_one_or_none()
+    
     if is_user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN , detail="username already exist cant make user")
 
-    is_user = db.query(UserModel).filter(UserModel.email == user_data["email"]).first()
+
+    result = await db.execute(select(UserModel).where(UserModel.email == user_data["email"]))
+    is_user = result.scalar_one_or_none()
 
     if is_user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN , detail="email already exist try with another")
@@ -31,17 +36,19 @@ def create_user(data:UserSchema , db:Session):
     )
 
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
 
     
 
     return new_user
 
 
-def get_user(user_id:int , db:Session):
+async def get_user(user_id:int , db:AsyncSession):
 
-    is_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+
+    is_user = result.scalar_one_or_none()
 
     if not is_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="user not exist")
@@ -49,30 +56,33 @@ def get_user(user_id:int , db:Session):
 
     return is_user
 
-def update_user(user_id , data:UserUpdateSchema , db:Session):
+async def update_user(user_id, data: UserUpdateSchema, db: AsyncSession):
 
-    is_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    is_user = result.scalar_one_or_none()
 
     if not is_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     user_data = data.model_dump(exclude_unset=True)
 
-    for field , value in user_data.items():
-        setattr(is_user , field , value)
+    for field, value in user_data.items():
+        setattr(is_user, field, value)
 
-
-    db.commit()
-    db.refresh(is_user)
+    await db.commit()
+    await db.refresh(is_user)
     return is_user
 
-def delete_user(user_id:int , db:Session):
-    is_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+
+
+async def delete_user(user_id: int, db: AsyncSession):
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    is_user = result.scalar_one_or_none()
 
     if not is_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="there is no user with this id")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="there is no user with this id")
 
-    db.delete(is_user)
-    db.commit()
+    await db.delete(is_user)
+    await db.commit()
 
     return None

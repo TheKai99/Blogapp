@@ -1,5 +1,7 @@
 from src.blogapp.dtos  import BlogResponseSchema , BlogSchema , UpdateBlogSchema , PatchBlogSchema
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.blogapp.models import BlogModel
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
@@ -8,108 +10,120 @@ from src.user.models import UserModel
 
 templates = Jinja2Templates(directory="templates")
 
-def create_blog(blog:BlogSchema , db:Session):
-    data = blog.model_dump()
-
-    new_blog = BlogModel(
-        user_id = data["user_id"],
-        title = data["title"],
-        content = data["content"],
-        date_published = data["date_published"])
-
-    db.add(new_blog)
-    db.commit()
-    db.refresh(new_blog)
-    
-    return new_blog
 
 
 # Home section 
-def home(request:Request ,db:Session):
-    blogs = db.query(BlogModel).all()
+async def home(request:Request ,db:AsyncSession):
+    result = await db.execute(select(BlogModel))
+    blogs = result.scalars().all()
     return templates.TemplateResponse(request , "home.html" , {"blogs":blogs , "title":"Home"})
 
 
 
+async def create_blog(blog: BlogSchema, db: AsyncSession):
+    data = blog.model_dump()
+
+    new_blog = BlogModel(
+        user_id=data["user_id"],
+        title=data["title"],
+        content=data["content"],
+        date_published=data["date_published"])
+
+    db.add(new_blog)
+    await db.commit()
+    await db.refresh(new_blog)
+
+    return new_blog
+
+
+
 #individual blog posts
-def get_blog(request:Request ,blog_id:int , db:Session):
-    blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+async def get_blog(request: Request, blog_id: int, db: AsyncSession):
+    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    blog = result.scalar_one_or_none()
 
     if not blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Page not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
 
-    return templates.TemplateResponse(request ,"post.html" , {"blog":blog , "title":"blog"} )
+    return templates.TemplateResponse(request, "post.html", {"blog": blog, "title": "blog"})
     
 
 
-def update_blog_fully(blog_id:int , blog:UpdateBlogSchema , db:Session):
+async def update_blog_fully(blog_id: int, blog: UpdateBlogSchema, db: AsyncSession):
     data = blog.model_dump()
-    is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+
+    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    is_blog = result.scalar_one_or_none()
 
     if not is_blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Page not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
 
-    is_user = db.query(BlogModel).filter(BlogModel.user_id == data['user_id']).first()
+    result = await db.execute(select(BlogModel).where(BlogModel.user_id == data['user_id']))
+    is_user = result.scalar_one_or_none()
 
     if not is_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="there is no user with this id")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="there is no user with this id")
 
     is_blog.user_id = data['user_id']
     is_blog.title = data['title']
     is_blog.content = data['content']
 
-    db.commit()
-    db.refresh(is_blog)
+    await db.commit()
+    await db.refresh(is_blog)
 
     return is_blog
 
 
-def update_blog_partially(blog_id:int , blog:PatchBlogSchema , db:Session):
-    
-    is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+async def update_blog_partially(blog_id: int, blog: PatchBlogSchema, db: AsyncSession):
+
+    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    is_blog = result.scalar_one_or_none()
 
     if not is_blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Page not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
 
     data = blog.model_dump(exclude_unset=True)
 
-    for field , value in data.items():
-        setattr(is_blog , field , value)
+    for field, value in data.items():
+        setattr(is_blog, field, value)
 
-
-    db.commit()
-    db.refresh(is_blog)
+    await db.commit()
+    await db.refresh(is_blog)
 
     return is_blog
 
 
-def delete_blog(blog_id:int , db:Session):
+async def delete_blog(blog_id: int, db: AsyncSession):
 
-    is_blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    is_blog = result.scalar_one_or_none()
 
     if not is_blog:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="blog not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="blog not found")
 
-    db.delete(is_blog)
-    db.commit()
+    await db.delete(is_blog)
+    await db.commit()
 
     return None
 
 
+# All the blogs regarding a specific user 
+async def user_blog_page(request ,user_id:int , db:AsyncSession):
 
-def user_blog_page(request ,user_id:int , db:Session):
-
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    response = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    user = response.scalar_one_or_none()
 
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="user not found")
 
-    result = db.query(BlogModel).filter(BlogModel.user_id == user_id).all()
+    result = await db.execute(select(BlogModel).where(BlogModel.user_id == user_id))
+    blogs = result.scalars().all()
 
-    return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":result , "user":user , "title":f"{user.username}blog's"} )
+    return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":blogs , "user":user , "title":f"{user.username}blog's"} )
 
 
 
-def get_all_blogs(db:Session):
-    all_blogs = db.query(BlogModel).all()
+async def get_all_blogs(db:AsyncSession):
+    result = await db.execute(select(BlogModel))
+    all_blogs = result.scalars().all()
     return all_blogs

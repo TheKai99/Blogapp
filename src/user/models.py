@@ -15,7 +15,7 @@ class UserModel(Base):
 
 
 
-# Relationship: lets you do user.blogs to get all their blogs
+# Relationship: lets  user.blogs to get all their blogs
     blogs = relationship("BlogModel" , back_populates="author" , cascade="all , delete-orphan",)
 
 
