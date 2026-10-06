@@ -1,5 +1,5 @@
 from pydantic import BaseModel , Field , field_serializer
-from datetime import datetime
+from datetime import datetime , UTC
 from src.user.dtos import UserResponseSchema
 
 
@@ -9,7 +9,8 @@ class BlogSchema(BaseModel):
     user_id:int # temporary
     title:str
     content:str
-    date_published: datetime = Field(default_factory=datetime.now)
+    date_published: datetime = Field(
+    default_factory=lambda: datetime.now(UTC).replace(tzinfo=None))
 
     
 

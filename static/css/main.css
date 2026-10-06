@@ -293,3 +293,8 @@ a.article-title:focus {
 .modal-header.bg-danger .modal-title {
   color: #ffffff !important;
 }
+
+
+#create-blog-modal {
+    display: none;
+}

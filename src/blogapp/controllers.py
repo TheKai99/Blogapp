@@ -1,5 +1,5 @@
 from src.blogapp.dtos  import BlogResponseSchema , BlogSchema , UpdateBlogSchema , PatchBlogSchema
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session , selectinload
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.blogapp.models import BlogModel
@@ -14,7 +14,7 @@ templates = Jinja2Templates(directory="templates")
 
 # Home section 
 async def home(request:Request ,db:AsyncSession):
-    result = await db.execute(select(BlogModel))
+    result = await db.execute(select(BlogModel).options(selectinload(BlogModel.author)))
     blogs = result.scalars().all()
     return templates.TemplateResponse(request , "home.html" , {"blogs":blogs , "title":"Home"})
 
@@ -27,11 +27,11 @@ async def create_blog(blog: BlogSchema, db: AsyncSession):
         user_id=data["user_id"],
         title=data["title"],
         content=data["content"],
-        date_published=data["date_published"])
+        date_published=data["date_published"].replace(tzinfo=None))
 
     db.add(new_blog)
     await db.commit()
-    await db.refresh(new_blog)
+    await db.refresh(new_blog , ["author"])
 
     return new_blog
 
@@ -39,7 +39,9 @@ async def create_blog(blog: BlogSchema, db: AsyncSession):
 
 #individual blog posts
 async def get_blog(request: Request, blog_id: int, db: AsyncSession):
-    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    result = await db.execute(select(BlogModel)
+                    .options(selectinload(BlogModel.author))
+                    .where(BlogModel.id == blog_id))
     blog = result.scalar_one_or_none()
 
     if not blog:
@@ -108,7 +110,7 @@ async def delete_blog(blog_id: int, db: AsyncSession):
 
 
 # All the blogs regarding a specific user 
-async def user_blog_page(request ,user_id:int , db:AsyncSession):
+async def user_blog_page(request , user_id:int , db:AsyncSession):
 
     response = await db.execute(select(UserModel).where(UserModel.id == user_id))
     user = response.scalar_one_or_none()
@@ -116,7 +118,10 @@ async def user_blog_page(request ,user_id:int , db:AsyncSession):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="user not found")
 
-    result = await db.execute(select(BlogModel).where(BlogModel.user_id == user_id))
+    result = await db.execute(select(BlogModel)
+                              .options(selectinload(BlogModel.author))
+                              .where(BlogModel.user_id == user_id))
+    
     blogs = result.scalars().all()
 
     return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":blogs , "user":user , "title":f"{user.username}blog's"} )
