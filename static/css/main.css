@@ -25,6 +25,10 @@
   --account-img-size: 7.813rem; /* 125px converted to rem */
 }
 
+TEST-MODAL {
+    color: red;
+}
+
 /* Base Styles */
 body {
   font-family: var(--font-body);
@@ -295,6 +299,218 @@ a.article-title:focus {
 }
 
 
+
+/* =========================
+   Create Blog Modal
+   ========================= */
+
 #create-blog-modal {
     display: none;
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    z-index: 1050;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+}
+
+
+/* Modal box */
+
+.create-blog-content {
+    width: 100%;
+    max-width: 560px;
+
+    background: #1f2d38;
+    color: #f1f5f9;
+
+    border: 1px solid rgba(82, 124, 159, 0.45);
+    border-radius: 14px;
+
+    padding: 28px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+
+/* Header */
+
+.create-blog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 25px;
+}
+
+.create-blog-header h2 {
+    margin: 0 0 6px;
+
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.create-blog-header p {
+    margin: 0;
+
+    color: #9caab5;
+    font-size: 14px;
+}
+
+
+/* Close button */
+
+.close-blog-btn {
+    border: none;
+    background: transparent;
+
+    color: #9caab5;
+
+    font-size: 30px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    padding: 2px 6px;
+
+    transition: 0.2s ease;
+}
+
+.close-blog-btn:hover {
+    color: white;
+    transform: scale(1.1);
+}
+
+
+/* Form */
+
+.create-blog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #d8e1e8;
+}
+
+
+/* Inputs */
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    background: #17232c;
+    color: #f1f5f9;
+
+    border: 1px solid #40515e;
+    border-radius: 8px;
+
+    padding: 12px 14px;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #71808b;
+}
+
+
+/* Input focus */
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #527c9f;
+
+    box-shadow: 0 0 0 3px rgba(82, 124, 159, 0.18);
+}
+
+
+/* Textarea */
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 160px;
+}
+
+
+/* Buttons */
+
+.create-blog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 5px;
+}
+
+.cancel-blog-btn,
+.submit-blog-btn {
+    border-radius: 7px;
+
+    padding: 10px 18px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+/* Cancel */
+
+.cancel-blog-btn {
+    background: transparent;
+
+    color: #aebbc5;
+
+    border: 1px solid #465763;
+}
+
+.cancel-blog-btn:hover {
+    background: #293945;
+    color: white;
+}
+
+
+/* Create */
+
+.submit-blog-btn {
+    background: #527c9f;
+
+    color: white;
+
+    border: 1px solid #527c9f;
+}
+
+.submit-blog-btn:hover {
+    background: #426982;
+
+    transform: translateY(-1px);
 }

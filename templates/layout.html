@@ -106,19 +106,55 @@
     </nav>
   </header>
   <div id="create-blog-modal">
-    <div class="modal-content">
-        <h2>Create Blog</h2>
 
-        <form>
-            <label>Title</label>
-            <input type="text">
+    <div class="create-blog-content">
 
-            <label>Content</label>
-            <textarea></textarea>
+        <div class="create-blog-header">
+            <div>
+                <h2>Create Blog</h2>
+                <p>Share your thoughts with the community.</p>
+            </div>
 
-            <button type="submit">Create</button>
+            <button id="close-blog-modal" class="close-blog-btn">&times;</button>
+        </div>
+
+        <form class="create-blog-form">
+
+            <div class="form-group">
+                <label for="blog-title">Title</label>
+                <input
+                    id="blog-title"
+                    type="text"
+                    placeholder="Give your blog a title..."
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="blog-content">Content</label>
+                <textarea
+                    id="blog-content"
+                    placeholder="Start writing your thoughts..."
+                    rows="7"
+                    required
+                ></textarea>
+            </div>
+
+            <div class="create-blog-actions">
+                <button type="button" id="cancel-blog-btn" class="cancel-blog-btn">
+                    Cancel
+                </button>
+
+                <button type="submit" class="submit-blog-btn">
+                    Create Blog
+                </button>
+            </div>
+
         </form>
+
     </div>
+
+</div>
 </div>
 
   <main role="main" class="container">
