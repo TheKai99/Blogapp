@@ -7,6 +7,7 @@ from src.blogapp.dtos import BlogSchema , BlogResponseSchema , UpdateBlogSchema 
 from src.blogapp import controllers
 from src.blogapp.models import BlogModel
 from src.utils.db import get_db
+from src.utils.dependency import get_current_user_id
 
 
 blog_routes = APIRouter(prefix="/blog")
@@ -15,8 +16,8 @@ blog_routes = APIRouter(prefix="/blog")
 
 # creating blog
 @blog_routes.post("/create" , response_model=BlogResponseSchema)
-async def create_blog(blog:BlogSchema , db:AsyncSession = Depends(get_db)):
-    return await controllers.create_blog(blog , db)
+async def create_blog(blog:BlogSchema , db:AsyncSession = Depends(get_db) , user_id:int = Depends(get_current_user_id)):
+    return await controllers.create_blog(blog , db , user_id)
 
 
 #Home section

@@ -14,20 +14,19 @@ templates = Jinja2Templates(directory="templates")
 
 # Home section 
 async def home(request:Request ,db:AsyncSession):
-    result = await db.execute(select(BlogModel).options(selectinload(BlogModel.author)))
+    result = await db.execute(select(BlogModel).options(selectinload(BlogModel.author)).order_by(BlogModel.date_published.desc()))
     blogs = result.scalars().all()
     return templates.TemplateResponse(request , "home.html" , {"blogs":blogs , "title":"Home"})
 
 
 
-async def create_blog(blog: BlogSchema, db: AsyncSession):
+async def create_blog(blog: BlogSchema, db: AsyncSession , user_id:int):
     data = blog.model_dump()
-
+    print(data)
     new_blog = BlogModel(
-        user_id=data["user_id"],
+        user_id=user_id,
         title=data["title"],
-        content=data["content"],
-        date_published=data["date_published"].replace(tzinfo=None))
+        content=data["content"])
 
     db.add(new_blog)
     await db.commit()
@@ -120,7 +119,7 @@ async def user_blog_page(request , user_id:int , db:AsyncSession):
 
     result = await db.execute(select(BlogModel)
                               .options(selectinload(BlogModel.author))
-                              .where(BlogModel.user_id == user_id))
+                              .where(BlogModel.user_id == user_id).order_by(BlogModel.date_published.desc()))
     
     blogs = result.scalars().all()
 

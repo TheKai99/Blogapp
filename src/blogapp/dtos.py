@@ -6,7 +6,7 @@ from src.user.dtos import UserResponseSchema
 
 class BlogSchema(BaseModel):
 
-    user_id:int # temporary
+    #user_id:int # temporary
     title:str
     content:str
     date_published: datetime = Field(
@@ -26,7 +26,7 @@ class BlogResponseSchema(BaseModel):
 
     @field_serializer('date_published')
     def format_date(self, value: datetime) -> str:
-        return value.strftime("%#I:%M %p %#d %B %Y").lower()
+        return value.strftime("%B %d, %Y").lower()
 
 
 class UpdateBlogSchema(BaseModel):
