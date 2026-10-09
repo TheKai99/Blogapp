@@ -51,7 +51,7 @@
                             Edit
                         </button>
 
-                        <button type="button" class="btn btn-danger">
+                        <button type="button" id="delete-blog-btn" class="btn btn-danger">
                             Delete
                         </button>
 
@@ -81,8 +81,7 @@
 
                                 <div class="form-group">
                                     <label for="update-blog-content">Content</label>
-                                    <textarea id="update-blog-content"  rows="7" 
-                                        required>{{ blog.content }}</textarea>
+                                    <textarea id="update-blog-content" rows="7" required>{{ blog.content }}</textarea>
                                 </div>
 
                                 <div class="update-blog-actions">
@@ -110,6 +109,33 @@
                         <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
                             Back to Home
                         </a>
+
+                    </div>
+                </div>
+
+
+                <!-- Delete blog model -->
+                <div id="delete-blog-modal" class="delete-modal">
+                    <div class="delete-modal-content">
+
+                        <h3>Delete Blog?</h3>
+
+                        <p>
+                            Are you sure you want to delete this blog post?
+                            This action cannot be undone.
+                        </p>
+
+                        <form class="delete-blog-form" data-blog-id="{{ blog.id }}">
+                            <div class="delete-modal-actions">
+                                <button type="button" id="cancel-delete-btn" class="btn btn-secondary">
+                                    Cancel
+                                </button>
+
+                                <button type="submit" id="delete-cofirm-btn" class="btn btn-danger">
+                                    Delete Blog
+                                </button>
+                            </div>
+                        </form>
 
                     </div>
                 </div>

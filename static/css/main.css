@@ -526,3 +526,33 @@ a.article-title:focus {
     align-items: center;
     padding: 20px;
 }
+
+
+
+
+#delete-blog-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(0, 0, 0, 0.72);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.delete-modal-content {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px;
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    color: var(--text-color, #222);
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}

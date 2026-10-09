@@ -71,7 +71,10 @@ createBlogForm.addEventListener("submit" , async function(event){
 });
 
 
-// blog Edit section
+
+//---------------------------------------------------------------------------------------//
+//// Edit blog model-- update edit  , fetch data to api endpoints
+//---------------------------------------------------------------------------------------//
 
 
 const updateBlogModal = document.getElementById("update-blog-modal");
@@ -145,6 +148,62 @@ updateBlogForm.addEventListener("submit" , async function(event){
 
 });
 
+
+
+//---------------------------------------------------------------------------------------//
+//// delete blog model-- del del del
+//---------------------------------------------------------------------------------------//
+
+
+const delBlogbutton = document.getElementById("delete-blog-btn");
+const delBlogModal = document.getElementById("delete-blog-modal");
+
+delBlogbutton.addEventListener("click" , function(){
+
+    delBlogModal.style.display = "flex";
+
+});
+
+const canceldelModal = document.getElementById("cancel-delete-btn");
+
+canceldelModal.addEventListener("click" , function(){
+
+    delBlogModal.style.display = "none";
+
+});
+
+delBlogModal.addEventListener("click" , function(event){
+
+    if(event.target === delBlogModal){
+        delBlogModal.style.display = "none";
+    }
+
+});
+
+const delBlogForm = document.querySelector(".delete-blog-form");
+
+delBlogForm.addEventListener("submit" , async function(event){
+
+    event.preventDefault();
+
+    const blogId = delBlogForm.dataset.blogId;
+
+    
+
+    const response = await fetch(`/blog/${blogId}` ,{
+        method:"DELETE",
+        headers: {
+            "content-type":"application/json"
+        }
+    });
+
+    if (response.ok) {
+        window.location.href="/blog/home";   // or window.location.href = "/" to go to the blogs page
+    } else {
+        console.error("Failed:", response.status, await response.text());
+         }
+
+});
 
 
 

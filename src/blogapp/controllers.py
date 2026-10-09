@@ -105,6 +105,8 @@ async def delete_blog(blog_id: int, db: AsyncSession):
     await db.delete(is_blog)
     await db.commit()
 
+    print(f"Deleted blog with ID: {blog_id}")
+
     return None
 
 
