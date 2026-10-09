@@ -40,3 +40,10 @@ class PatchBlogSchema(BaseModel):
 
     title:str
     content:str
+
+
+class UpdateResponseSchema(BaseModel):
+
+    id:int
+    title:str
+    content:str

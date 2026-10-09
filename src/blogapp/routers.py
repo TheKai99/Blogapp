@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from src.blogapp.dtos import BlogSchema , BlogResponseSchema , UpdateBlogSchema , PatchBlogSchema
+from src.blogapp.dtos import BlogSchema , BlogResponseSchema , UpdateBlogSchema , PatchBlogSchema , UpdateResponseSchema
 from src.blogapp import controllers
 from src.blogapp.models import BlogModel
 from src.utils.db import get_db
@@ -39,7 +39,7 @@ async def update_blog_fully(blog_id:int , blog:UpdateBlogSchema , db:AsyncSessio
 
 
 #update blog partially
-@blog_routes.patch("/{blog_id}", response_model=BlogResponseSchema)
+@blog_routes.patch("/{blog_id}", response_model=UpdateResponseSchema)
 async def update_blog_partially(blog_id:int , blog:PatchBlogSchema , db:AsyncSession = Depends(get_db)):
     return await controllers.update_blog_partially(blog_id , blog , db)
 

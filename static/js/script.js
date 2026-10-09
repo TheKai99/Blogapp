@@ -2,17 +2,16 @@
 console.log("JavaScript is working!");
 console.log("hii");
 
-
+// blog create button and model section
 const createBlogModal = document.getElementById("create-blog-modal");
 const createBlogButton = document.getElementById("create-blog-btn");
-
 
 createBlogButton.addEventListener("click" , function(){
     createBlogModal.style.display = "flex";
 });
 
 
-
+// close button
 const closeBlogButton = document.getElementById("close-blog-modal");
 
 closeBlogButton.addEventListener("click", function() {
@@ -20,6 +19,7 @@ closeBlogButton.addEventListener("click", function() {
 });
 
 
+//cancel blog
 const cancelBlogButton = document.getElementById("cancel-blog-btn");
 
 cancelBlogButton.addEventListener("click" , function(){
@@ -28,7 +28,7 @@ cancelBlogButton.addEventListener("click" , function(){
 })
 
 
-
+// to disappear the model when we click anywhere else except the model or form
 createBlogModal.addEventListener("click", function(event) {
 
     if (event.target === createBlogModal) {
@@ -38,6 +38,7 @@ createBlogModal.addEventListener("click", function(event) {
 });
 
 
+// to get the data from the model form and then send it to the api endpoints the page refresh
 const createBlogForm = document.querySelector(".create-blog-form");
 
 createBlogForm.addEventListener("submit" , async function(event){
@@ -68,6 +69,83 @@ createBlogForm.addEventListener("submit" , async function(event){
          }
 
 });
+
+
+// blog Edit section
+
+
+const updateBlogModal = document.getElementById("update-blog-modal");
+const updateBlogbutton = document.getElementById("update-blog-btn");
+
+updateBlogbutton.addEventListener("click" , function(){
+
+    updateBlogModal.style.display = "flex";
+});
+
+
+// close button edit
+const closeEditButton = document.getElementById("close-edit-btn");
+
+closeEditButton.addEventListener("click", function() {
+    updateBlogModal.style.display = "none";
+});
+
+
+//cancel blog edit
+const cancelEditButton = document.getElementById("cancel-edit-btn");
+
+cancelEditButton.addEventListener("click" , function(){
+
+    updateBlogModal.style.display = "none";
+})
+
+
+updateBlogModal.addEventListener("click", function(event) {
+
+    if (event.target === updateBlogModal) {
+        updateBlogModal.style.display = "none";
+    }
+
+});
+
+
+// For the update or edit blog model and actions
+
+const updateBlogForm = document.querySelector(".update-blog-form");
+
+updateBlogForm.addEventListener("submit" , async function(event){
+
+    event.preventDefault();
+
+    const title = document.getElementById("update-blog-title").value;
+    const content = document.getElementById("update-blog-content").value;
+
+    const blogId = updateBlogForm.dataset.blogId;
+
+    console.log("Getting" , title , content , blogId);
+
+
+    const response = await fetch(`/blog/${blogId}` ,{
+        method:"PATCH",
+        headers: {
+            "content-type":"application/json"
+        },
+        body: JSON.stringify({
+            title: title,
+            content: content
+        })
+    });
+
+    if (response.ok) {
+        window.location.reload();   // or window.location.href = "/" to go to the blogs page
+    } else {
+        console.error("Failed:", response.status, await response.text());
+         }
+
+
+});
+
+
 
 
 
