@@ -7,7 +7,10 @@ from src.user.dtos import UserResponseSchema
 class BlogSchema(BaseModel):
 
     #user_id:int # temporary
-    title:str
+    title:str = Field(
+        min_length=1,
+        max_length=50
+    )
     content:str
     date_published: datetime = Field(
     default_factory=lambda: datetime.now(UTC).replace(tzinfo=None))

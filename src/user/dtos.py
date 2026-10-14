@@ -5,9 +5,16 @@ class UserSchema(BaseModel):
 
     username:str = Field(min_length=1 , max_length=120)
     email:EmailStr = Field(max_length=120)
-    image_file:str
+    password:str = Field(min_length=8)
 
 
+
+class UserLoginSchema(BaseModel):
+    username:str
+    password:str
+
+
+    
 class UserResponseSchema(BaseModel):
 
     id:int

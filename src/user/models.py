@@ -11,6 +11,7 @@ class UserModel(Base):
     id = Column(Integer , primary_key=True ,index=True)
     username = Column(String , unique=True , nullable=False)
     email = Column(String , unique=True , nullable=False)
+    password_hash = Column(String , unique=True , nullable=False)
     image_file = Column(String , unique=False , nullable=True ,default=None )
 
 

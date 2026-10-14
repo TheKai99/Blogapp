@@ -14,7 +14,9 @@ dependencies = [
     "psycopg>=3.3.6",
     "psycopg-binary>=3.3.6",
     "psycopg2-binary>=2.9.13",
+    "pwdlib[argon2]>=0.3.1",
     "pydantic-settings>=2.15.0",
+    "pyjwt>=2.15.1",
     "sqlalchemy[asyncio]>=2.1.1",
     "starlette>=1.7.0",
 ]

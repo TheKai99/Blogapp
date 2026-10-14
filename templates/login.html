@@ -1,0 +1,82 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Welcome Back</h2>
+                        <p class="text-secondary">
+                            Log in to continue sharing your thoughts.
+                        </p>
+                    </div>
+
+                    <!-- Login error message -->
+                    <div
+                        id="login-error"
+                        class="alert alert-danger d-none"
+                        role="alert">
+                    </div>
+
+                    <form id="login-form">
+
+                        <div class="mb-3">
+                            <label for="login-username" class="form-label">
+                                Username
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="login-username"
+                                name="username"
+                                placeholder="Enter your username"
+                                autocomplete="username"
+                                required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="login-password" class="form-label">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="login-password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required>
+                        </div>
+
+                        <button
+                            type="submit"
+                            id="login-submit"
+                            class="btn btn-success w-100 py-2">
+                            Login
+                        </button>
+
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span class="text-secondary">
+                            Don't have an account?
+                        </span>
+                        <a
+                            href="/user/register"
+                            class="text-decoration-none">
+                            Create Account
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

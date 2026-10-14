@@ -395,6 +395,13 @@ a.article-title:focus {
     gap: 20px;
 }
 
+
+.blog-title {
+    font-size: 2rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
 .form-group {
     display: flex;
     flex-direction: column;

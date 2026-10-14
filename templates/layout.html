@@ -76,13 +76,25 @@
           <!-- Navbar Right Side -->
 
           <!--create blog button -->
-          <button id="create-blog-btn" class="btn btn-success mb-2 mb-md-0 me-md-2">
-            Create Blog
-          </button>
+
 
           <div class="navbar-nav">
-            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="#">Login</a>
-            <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="#">Register</a>
+
+            <!-- Shown when logged out -->
+            <div id="loggedOutNav">
+              <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="{{ url_for('login_page') }}">Login</a>
+              <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="{{ url_for('register_page') }}">Register</a>
+            </div>
+
+            <!-- Shown when logged in (hidden by default, shown via JS) -->
+            <div id="loggedInNav" class="d-none">
+              <button id="create-blog-btn" class="btn btn-success mb-2 mb-md-0 me-md-2">
+                Create Blog
+              </button>
+              <span id="usernameDisplay" class="navbar-text me-md-2"></span>
+              <button class="btn btn-outline-light mb-2 mb-md-0 me-md-3" type="button" id="logoutBtn">Logout</button>
+            </div>
+
             <div class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" id="bd-theme" data-bs-toggle="dropdown"
                 aria-expanded="false">
@@ -109,53 +121,43 @@
 
     <div class="create-blog-content">
 
-        <div class="create-blog-header">
-            <div>
-                <h2>Create Blog</h2>
-                <p>Share your thoughts with the community.</p>
-            </div>
-
-            <button id="close-blog-modal" class="close-blog-btn">&times;</button>
+      <div class="create-blog-header">
+        <div>
+          <h2>Create Blog</h2>
+          <p>Share your thoughts with the community.</p>
         </div>
 
-        <form class="create-blog-form">
+        <button id="close-blog-modal" class="close-blog-btn">&times;</button>
+      </div>
 
-            <div class="form-group">
-                <label for="blog-title">Title</label>
-                <input
-                    id="blog-title"
-                    type="text"
-                    placeholder="Give your blog a title..."
-                    required
-                >
-            </div>
+      <form class="create-blog-form">
 
-            <div class="form-group">
-                <label for="blog-content">Content</label>
-                <textarea
-                    id="blog-content"
-                    placeholder="Start writing your thoughts..."
-                    rows="7"
-                    required
-                ></textarea>
-            </div>
+        <div class="form-group">
+          <label for="blog-title">Title</label>
+          <input id="blog-title" type="text" maxlength="50" placeholder="Give your blog a title..." required>
+        </div>
 
-            <div class="create-blog-actions">
-                <button type="button" id="cancel-blog-btn" class="cancel-blog-btn">
-                    Cancel
-                </button>
+        <div class="form-group">
+          <label for="blog-content">Content</label>
+          <textarea id="blog-content" placeholder="Start writing your thoughts..." rows="7" required></textarea>
+        </div>
 
-                <button type="submit" class="submit-blog-btn">
-                    Create Blog
-                </button>
-            </div>
+        <div class="create-blog-actions">
+          <button type="button" id="cancel-blog-btn" class="cancel-blog-btn">
+            Cancel
+          </button>
 
-        </form>
+          <button type="submit" class="submit-blog-btn">
+            Create Blog
+          </button>
+        </div>
+
+      </form>
 
     </div>
 
-</div>
-</div>
+  </div>
+  </div>
 
   <main role="main" class="container">
     <div class="row">
@@ -221,6 +223,7 @@
 
 
   <script src="{{ url_for('static', path='js/script.js') }}"></script>
+  <script src="{{ url_for('static', path='js/auth.js') }}"></script>
 </body>
 
 </html>

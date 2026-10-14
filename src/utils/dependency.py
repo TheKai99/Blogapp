@@ -1,2 +1,2 @@
 async def get_current_user_id() -> int:
-    return 2
+    return 6
