@@ -39,22 +39,26 @@ async def update_blog_fully(blog_id:int , blog:UpdateBlogSchema , db:AsyncSessio
 
 
 #update blog partially
-@blog_routes.patch("/{blog_id}", response_model=UpdateResponseSchema)
-async def update_blog_partially(blog_id:int , blog:PatchBlogSchema , db:AsyncSession = Depends(get_db)):
-    return await controllers.update_blog_partially(blog_id , blog , db)
+@blog_routes.patch("/{blog_id}", response_model=UpdateResponseSchema )
+async def update_blog_partially(blog_id:int ,
+                        blog:PatchBlogSchema , 
+                        user_id:int = Depends(get_current_user_id) , 
+                        db:AsyncSession = Depends(get_db)):
+    return await controllers.update_blog_partially(blog_id , blog ,user_id , db)
 
 
 #delete the blog
 @blog_routes.delete("/{blog_id}" , status_code=status.HTTP_204_NO_CONTENT)
-async def delete_blog(blog_id:int , db:AsyncSession = Depends(get_db)):
-    return await controllers.delete_blog(blog_id , db)
+async def delete_blog(blog_id:int ,
+                      user_id:int = Depends(get_current_user_id),
+                      db:AsyncSession = Depends(get_db)):
+    return await controllers.delete_blog(blog_id ,user_id ,  db)
 
 
 #User posts page
 @blog_routes.get("/{user_id}/blogs")
 async def user_blog_page(request:Request , user_id:int , db:AsyncSession = Depends(get_db)):
     return await controllers.user_blog_page(request ,user_id , db)
-
 
 
 #get all the blogs

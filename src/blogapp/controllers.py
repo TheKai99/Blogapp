@@ -75,13 +75,18 @@ async def update_blog_fully(blog_id: int, blog: UpdateBlogSchema, db: AsyncSessi
     return is_blog
 
 
-async def update_blog_partially(blog_id: int, blog: PatchBlogSchema, db: AsyncSession):
+async def update_blog_partially(blog_id: int, blog: PatchBlogSchema, user_id:int , db: AsyncSession , ):
 
-    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    result = await db.execute(select(BlogModel)
+                              .options(selectinload(BlogModel.author))
+                              .where(BlogModel.user_id == user_id,
+                                     BlogModel.id == blog_id))
+    
     is_blog = result.scalar_one_or_none()
 
     if not is_blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN , detail="not allowed to edit this post!")
+
 
     data = blog.model_dump(exclude_unset=True)
 
@@ -94,9 +99,13 @@ async def update_blog_partially(blog_id: int, blog: PatchBlogSchema, db: AsyncSe
     return is_blog
 
 
-async def delete_blog(blog_id: int, db: AsyncSession):
+async def delete_blog(blog_id: int,user_id:int ,  db: AsyncSession):
 
-    result = await db.execute(select(BlogModel).where(BlogModel.id == blog_id))
+    result = await db.execute(select(BlogModel)
+                              .options(selectinload(BlogModel.author))
+                              .where(BlogModel.id == blog_id,
+                                    BlogModel.user_id == user_id))
+    
     is_blog = result.scalar_one_or_none()
 
     if not is_blog:

@@ -29,6 +29,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 
+
 app.include_router(blog_routes , tags=["Blogs"])
 app.include_router(user_routes , tags=["Users"])
 

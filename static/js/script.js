@@ -38,8 +38,9 @@ createBlogModal.addEventListener("click", function (event) {
 });
 
 
-// to get the data from the model form and then send it to the api endpoints the page refresh
+// to get the data from the model form and then send it to the api endpoints the page refresh along with the jwt
 const createBlogForm = document.querySelector(".create-blog-form");
+
 
 createBlogForm.addEventListener("submit", async function (event) {
 
@@ -48,13 +49,20 @@ createBlogForm.addEventListener("submit", async function (event) {
     const title = document.getElementById("blog-title").value;
     const content = document.getElementById("blog-content").value;
 
+    const token = localStorage.getItem("access_token");
+    
+    if(!token){
+        console.error("token not even exist!!");
+        return;
+    }
 
     console.log("Sending", title, content);
 
     const response = await fetch("/blog/create", {
         method: "POST",
         headers: {
-            "content-type": "application/json"
+            "content-type": "application/json",
+            "Authorization":`Bearer ${token}`
         },
         body: JSON.stringify({
             title: title,
