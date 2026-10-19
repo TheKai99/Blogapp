@@ -44,8 +44,9 @@
 
                     <hr class="border-secondary">
 
-                    {% if blog.author.id == 2 %}
-                    <div class="post-actions mt-4 d-flex gap-2">
+
+                    <div class="post-actions mt-4 d-flex gap-2 d-none" id="post-actions"
+                        data-author-id="{{blog.author.id}}">
 
                         <button type="button" id="update-blog-btn" class="btn btn-primary">
                             Edit
@@ -56,8 +57,6 @@
                         </button>
 
                     </div>
-
-                    {% endif %}
 
                     <!--model for edit the blog-->
                     <div id="update-blog-modal">

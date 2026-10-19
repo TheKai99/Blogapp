@@ -119,9 +119,20 @@ async def update_user(user_id, data: UserUpdateSchema, db: AsyncSession):
 
     result = await db.execute(select(UserModel).where(UserModel.id == user_id))
     is_user = result.scalar_one_or_none()
-
     if not is_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if data.email:
+        result = await db.execute(select(UserModel).where(UserModel.email == data.email , UserModel.id != user_id) )
+        email_exist = result.scalar_one_or_none()
+        if email_exist:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail="email already exist try another")
+
+    if data.username:
+            result = await db.execute(select(UserModel).where(UserModel.username == data.username , UserModel.id != user_id) )
+            username = result.scalar_one_or_none()
+            if username:
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail="username already exist try another")
 
     user_data = data.model_dump(exclude_unset=True)
 

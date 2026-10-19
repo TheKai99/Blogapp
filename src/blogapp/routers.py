@@ -13,7 +13,6 @@ from src.utils.dependency import get_current_user_id
 blog_routes = APIRouter(prefix="/blog")
 
 
-
 # creating blog
 @blog_routes.post("/create" , response_model=BlogResponseSchema)
 async def create_blog(blog:BlogSchema , db:AsyncSession = Depends(get_db) , user_id:int = Depends(get_current_user_id)):
@@ -28,7 +27,7 @@ async def home(request:Request , db:AsyncSession = Depends(get_db)):
 
 # get a single blog
 @blog_routes.get("/{blog_id}" , response_model=BlogResponseSchema)
-async def get_blog(request:Request ,blog_id:int , db:AsyncSession = Depends(get_db)):
+async def get_blog(request:Request ,blog_id:int ,  db:AsyncSession = Depends(get_db)):
     return await  controllers.get_blog(request ,blog_id , db)
 
 
@@ -41,8 +40,8 @@ async def update_blog_fully(blog_id:int , blog:UpdateBlogSchema , db:AsyncSessio
 #update blog partially
 @blog_routes.patch("/{blog_id}", response_model=UpdateResponseSchema )
 async def update_blog_partially(blog_id:int ,
-                        blog:PatchBlogSchema , 
-                        user_id:int = Depends(get_current_user_id) , 
+                        blog:PatchBlogSchema ,
+                        user_id:int = Depends(get_current_user_id),
                         db:AsyncSession = Depends(get_db)):
     return await controllers.update_blog_partially(blog_id , blog ,user_id , db)
 

@@ -127,7 +127,7 @@ if (loginForm) {
 }
 
 
-const logOutBtn = document.getElementById("logoutBtn");
+const logOutBtn = document.getElementById("account-logout-btn");
 
 logOutBtn.addEventListener("click" , function(){
 

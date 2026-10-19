@@ -91,8 +91,7 @@
               <button id="create-blog-btn" class="btn btn-success mb-2 mb-md-0 me-md-2">
                 Create Blog
               </button>
-              <span id="usernameDisplay" class="navbar-text me-md-2"></span>
-              <button class="btn btn-outline-light mb-2 mb-md-0 me-md-3" type="button" id="logoutBtn">Logout</button>
+              <a id="usernameDisplay" href="{{ url_for('account_page') }}" class="navbar-text me-md-2"></a>
             </div>
 
             <div class="nav-item dropdown">
@@ -224,6 +223,7 @@
 
   <script src="{{ url_for('static', path='js/script.js') }}"></script>
   <script src="{{ url_for('static', path='js/auth.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </body>
 
 </html>

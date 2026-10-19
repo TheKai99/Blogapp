@@ -1,4 +1,4 @@
-from src.user.routers import oauth2_scheme
+
 from fastapi import Depends
 import jwt
 from src.utils.settings import settings
@@ -7,6 +7,10 @@ from fastapi import status , HTTPException
 from sqlalchemy import select
 from src.user.models import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.security import OAuth2PasswordBearer
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login") 
 
 
 

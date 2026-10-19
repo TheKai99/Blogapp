@@ -34,10 +34,10 @@ async def create_blog(blog: BlogSchema, db: AsyncSession , user_id:int):
 
     return new_blog
 
-
+from src.utils.dependency import get_current_user_id
 
 #individual blog posts
-async def get_blog(request: Request, blog_id: int, db: AsyncSession):
+async def get_blog(request: Request, blog_id: int,  db: AsyncSession):
     result = await db.execute(select(BlogModel)
                     .options(selectinload(BlogModel.author))
                     .where(BlogModel.id == blog_id))
@@ -46,7 +46,8 @@ async def get_blog(request: Request, blog_id: int, db: AsyncSession):
     if not blog:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
 
-    return templates.TemplateResponse(request, "post.html", {"blog": blog, "title": "blog"})
+    return templates.TemplateResponse(request, "post.html", {"blog": blog,
+                                                              "title": "blog"})
     
 
 

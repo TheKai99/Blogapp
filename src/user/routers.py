@@ -7,9 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.templating import Jinja2Templates
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm , OAuth2PasswordBearer
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
+from src.utils.dependency import get_current_user_id, oauth2_scheme
 
 templates = Jinja2Templates(directory="templates")
 
@@ -22,6 +20,17 @@ async def register_page(request: Request):
         request,
         "register.html"
     )
+
+
+#Account page 
+@user_routes.get("/account")
+async def account_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "account.html"
+    )
+
+
 
 @user_routes.get("/login")
 async def login_page(request:Request):
@@ -51,8 +60,8 @@ async def get_user(user_id:int , db:AsyncSession = Depends(get_db)):
     return await controllers.get_user(user_id , db)
 
 
-@user_routes.patch("/update/{user_id}")
-async def update_user(user_id:int , data:UserUpdateSchema , db:AsyncSession = Depends(get_db)):
+@user_routes.patch("/update")
+async def update_user( data:UserUpdateSchema , user_id:int = Depends(get_current_user_id) , db:AsyncSession = Depends(get_db)):
     return await controllers.update_user(user_id , data , db)
 
 

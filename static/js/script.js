@@ -2,6 +2,76 @@
 console.log("JavaScript is working!");
 console.log("hii");
 
+
+///----------------------------------------------------------------------------------//
+////  Load current User for the detaisl to display on navbar and chenging the navboar //
+//////////////////from the simple to loggin user nav //////////////////////////////////////
+
+async function loadcurrentuser() {
+
+    console.log("loading current user!:");
+
+    const token = localStorage.getItem("access_token");
+
+    console.log("Token exists:", !!token);
+
+    if (!token) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/user/me", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status == 401) {
+                localStorage.removeItem("access_token");
+
+            }
+            return;
+        }
+
+        const user = await response.json();
+
+        console.log("Current user:", user.id);
+
+        const postActions = document.getElementById("post-actions");
+
+        console.log("Post actions element:", postActions);
+        console.log("Blog author ID:", postActions?.dataset.authorId);
+
+        if (postActions && user.id === Number(postActions.dataset.authorId)) {
+            postActions.classList.remove("d-none");
+            console.log("Edit/Delete buttons displayed");
+        }
+
+        const loggedInNav = document.getElementById('loggedInNav');
+        const loggedOutNav = document.getElementById('loggedOutNav');
+
+        loggedInNav.classList.remove('d-none');
+        loggedInNav.classList.add('d-flex');
+        loggedOutNav.classList.add('d-none');
+        document.getElementById('usernameDisplay').textContent = user.email;
+
+
+        return user;
+
+    } catch (error) {
+        console.error("Error loading current user:", error);
+    }
+
+
+};
+
+
+
+
+
+
 // blog create button and model section
 const createBlogModal = document.getElementById("create-blog-modal");
 const createBlogButton = document.getElementById("create-blog-btn");
@@ -50,8 +120,8 @@ createBlogForm.addEventListener("submit", async function (event) {
     const content = document.getElementById("blog-content").value;
 
     const token = localStorage.getItem("access_token");
-    
-    if(!token){
+
+    if (!token) {
         console.error("token not even exist!!");
         return;
     }
@@ -62,7 +132,7 @@ createBlogForm.addEventListener("submit", async function (event) {
         method: "POST",
         headers: {
             "content-type": "application/json",
-            "Authorization":`Bearer ${token}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
             title: title,
@@ -143,12 +213,15 @@ if (updateBlogForm) {
         const blogId = updateBlogForm.dataset.blogId;
 
         console.log("Getting", title, content, blogId);
+        
 
+        const token = localStorage.getItem("access_token");
 
         const response = await fetch(`/blog/${blogId}`, {
             method: "PATCH",
             headers: {
-                "content-type": "application/json"
+                "content-type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 title: title,
@@ -206,6 +279,7 @@ if (delBlogModal) {
 
 const delBlogForm = document.querySelector(".delete-blog-form");
 
+
 if (delBlogForm) {
     delBlogForm.addEventListener("submit", async function (event) {
 
@@ -213,12 +287,15 @@ if (delBlogForm) {
 
         const blogId = delBlogForm.dataset.blogId;
 
+        const token = localStorage.getItem("access_token");
 
 
+ 
         const response = await fetch(`/blog/${blogId}`, {
             method: "DELETE",
             headers: {
-                "content-type": "application/json"
+                "content-type": "application/json",
+                "Authorization": `Bearer ${token}`
             }
         });
 
@@ -232,63 +309,27 @@ if (delBlogForm) {
 }
 
 
-///----------------------------------------------------------------------------------//
-////  Load current User for the detaisl to display on navbar and chenging the navboar //
-//////////////////from the simple to loggin user nav //////////////////////////////////////
-
-async function loadcurrentuser() {
-
-    console.log("loading current user!:");
-
-    const token = localStorage.getItem("access_token");
-
-    console.log("Token exists:", !!token);
-
-    if (!token) {
-        return;
-    }
-
-    try {
-        const response = await fetch("/user/me", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            if (response.status == 401) {
-                localStorage.removeItem("access_token");
-
-            }
-            return;
-        }
-
-        const user = await response.json();
-
-        const loggedInNav = document.getElementById('loggedInNav');
-        const loggedOutNav = document.getElementById('loggedOutNav');
-
-        loggedInNav.classList.remove('d-none');
-        loggedInNav.classList.add('d-flex');
-        loggedOutNav.classList.add('d-none');
-        document.getElementById('usernameDisplay').textContent = user.email;
-
-    } catch (error) {
-        console.error("Error loading current user:", error);
-    }
 
 
-};
+
+
+
+
+
+// profile update section------------------------------------------//
+//-----------------------------------------------------------------//
+
+
+
+
+
+
+
+
+
 
 
 
 document.addEventListener("DOMContentLoaded", () => {
     loadcurrentuser();
 });
-
-
-
-
-
-
