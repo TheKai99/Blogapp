@@ -13,6 +13,9 @@ from jwt.exceptions import InvalidTokenError
 from datetime import datetime
 from datetime import timedelta
 from fastapi.templating import Jinja2Templates
+from src.utils.image_utils import process_profile_image , delete_profile_image
+from PIL import UnidentifiedImageError
+from starlette.concurrency import run_in_threadpool
 
 templates = Jinja2Templates(directory="templates")
 
@@ -156,3 +159,37 @@ async def delete_user(user_id: int, db: AsyncSession):
     await db.commit()
 
     return None
+
+
+async def update_profile_pic(file , current_user , db):
+    
+    content = await file.read()
+
+    if len(content) > settings.MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"file to large the accepted size is {settings.MAX_UPLOAD_SIZE_BYTES // (1024*1024)}MB")
+
+    try:
+        new_filename = await run_in_threadpool(process_profile_image , content)
+
+    except UnidentifiedImageError as err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid image file , upload a valid image",
+        ) from err
+
+    result = await db.execute(select(UserModel).where(UserModel.id == current_user))
+    user = result.scalar_one_or_none()
+
+    old_filename = user.image_file
+
+    user.image_file = new_filename
+
+    await db.commit()
+    await db.refresh(user)
+
+
+    if old_filename:
+        delete_profile_image(old_filename)
+
+    return user

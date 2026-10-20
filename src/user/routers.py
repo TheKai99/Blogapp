@@ -1,4 +1,4 @@
-from fastapi import APIRouter , Depends , status , Request
+from fastapi import APIRouter , Depends , status , Request , UploadFile
 from src.user import controllers
 from src.user.dtos import UserSchema , UserResponseSchema , UserUpdateSchema , UserLoginSchema
 from sqlalchemy.orm import Session
@@ -29,7 +29,6 @@ async def account_page(request: Request):
         request,
         "account.html"
     )
-
 
 
 @user_routes.get("/login")
@@ -69,3 +68,11 @@ async def update_user( data:UserUpdateSchema , user_id:int = Depends(get_current
 @user_routes.delete("/delete/{user_id}" , status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id:int , db:AsyncSession = Depends(get_db)):
     return await controllers.delete_user(user_id , db)
+
+
+
+@user_routes.patch("/update_pic" , response_model=UserResponseSchema)
+async def update_profile_pic(file:UploadFile,
+                             current_user = Depends(get_current_user_id),
+                             db:AsyncSession = Depends(get_db)):
+    return await controllers.update_profile_pic(file , current_user , db)

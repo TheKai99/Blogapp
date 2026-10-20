@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     SECRET_KEY:str
     ALGORITHM:str
     ACCESS_TOKEN_EXPIRE_MINUTES:int
+    MAX_UPLOAD_SIZE_BYTES:int = 5*1024*1024
 
 
 

@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <form id="profile-photo-form">
+        <form class="profile-photo-form">
             <div class="photo-upload-area">
 
                 <div class="photo-upload-details">
@@ -156,8 +156,6 @@
     }
 
 
-
-
     const updateprofileinfo = document.querySelector(".profile-update-form");
 
     if (updateprofileinfo) {
@@ -206,6 +204,47 @@
                 console.error("Failed:", response.status, await response.text());
             }
         });
+    }
+
+    const profilephotoform = document.querySelector(".profile-photo-form");
+
+    if(profilephotoform){
+
+        profilephotoform.addEventListener("submit" , async function(event){
+
+            event.preventDefault();
+
+            const fileinput  = document.getElementById("profile-photo");
+
+            const formdata = new FormData();
+
+            formdata.append("file" , fileinput.files[0]);
+
+            const token = localStorage.getItem("access_token");
+
+            if(!token){
+                window.location.href = "/user/login";
+                return;
+            }
+
+
+            const response = await fetch('/user/update_pic/',{
+                method:"PATCH",
+                headers:{
+                    "Authorization":`Bearer ${token}`
+                },
+                body:formdata
+            });
+
+            if(response.ok){
+                window.location.reload();
+            }else{
+                console.error("Failed:", response.status, await response.text());
+            }
+
+        });
+
+
     }
 
     AccountDetails();
