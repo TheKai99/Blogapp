@@ -22,4 +22,15 @@
       </div>
     </article>
   {% endfor %}
+  <div class="pagination">
+    {% if has_previous %}
+        <a href="/blog/home/?page={{ page - 1 }}">Previous</a>
+    {% endif %}
+
+    <span>Page {{ page }}</span>
+
+    {% if has_next %}
+        <a href="/blog/home/?page={{ page + 1 }}">Next</a>
+    {% endif %}
+</div>
 {% endblock content %}

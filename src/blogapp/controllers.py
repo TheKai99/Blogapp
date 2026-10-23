@@ -1,6 +1,6 @@
 from src.blogapp.dtos  import BlogResponseSchema , BlogSchema , UpdateBlogSchema , PatchBlogSchema
 from sqlalchemy.orm import Session , selectinload
-from sqlalchemy import select
+from sqlalchemy import select , func
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.blogapp.models import BlogModel
 from fastapi.templating import Jinja2Templates
@@ -13,10 +13,23 @@ templates = Jinja2Templates(directory="templates")
 
 
 # Home section 
-async def home(request:Request ,db:AsyncSession):
-    result = await db.execute(select(BlogModel).options(selectinload(BlogModel.author)).order_by(BlogModel.date_published.desc()))
+async def home(request:Request ,page,db:AsyncSession):
+
+    limit = 8
+    offset = (page-1)*limit
+
+    check = await db.execute(select(func.count()).select_from(BlogModel))
+    total = check.scalar_one() or 0
+
+    result = await db.execute(select(BlogModel)
+                        .options(selectinload(BlogModel.author))
+                        .order_by(BlogModel.date_published.desc()).offset(offset).limit(limit))
     blogs = result.scalars().all()
-    return templates.TemplateResponse(request , "home.html" , {"blogs":blogs , "title":"Home"})
+    return templates.TemplateResponse(request , "home.html" , {"blogs":blogs , "title":"Home",
+                                                               "page":page,
+                                                               "total":total,
+                                                               "has_previous":page>1,
+                                                               "has_next":offset + len(blogs) < total})
 
 
 
@@ -121,7 +134,10 @@ async def delete_blog(blog_id: int,user_id:int ,  db: AsyncSession):
 
 
 # All the blogs regarding a specific user 
-async def user_blog_page(request , user_id:int , db:AsyncSession):
+async def user_blog_page(request , user_id ,page , db:AsyncSession):
+
+    limit = 2
+    offset = (page-1)*limit
 
     response = await db.execute(select(UserModel).where(UserModel.id == user_id))
     user = response.scalar_one_or_none()
@@ -129,17 +145,32 @@ async def user_blog_page(request , user_id:int , db:AsyncSession):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="user not found")
 
+    check = await db.execute(select(func.count()).select_from(BlogModel).where(BlogModel.user_id == user_id))
+    total = check.scalar_one()
+
     result = await db.execute(select(BlogModel)
                               .options(selectinload(BlogModel.author))
-                              .where(BlogModel.user_id == user_id).order_by(BlogModel.date_published.desc()))
+                              .where(BlogModel.user_id == user_id).order_by(BlogModel.date_published.desc()).offset(offset).limit(limit))
     
     blogs = result.scalars().all()
 
-    return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":blogs , "user":user , "title":f"{user.username}blog's"} )
+    return templates.TemplateResponse(request ,"user_posts.html" , {"blogs":blogs ,
+                                                                    "user":user ,
+                                                                    "title":f"{user.username}blog's",
+                                                                    "page":page,
+                                                                    "total":total,
+                                                                    "has_previous":page>1,
+                                                                    "has_next":offset + len(blogs) < total} )
 
 
 
-async def get_all_blogs(db:AsyncSession):
-    result = await db.execute(select(BlogModel))
+async def get_all_blogs(page , db:AsyncSession):
+
+    limit = 4
+    offset = (page-1)*limit
+    check = await db.execute(select(func.count()).select_from(BlogModel))
+    total = check.scalar_one()
+
+    result = await db.execute(select(BlogModel).order_by(BlogModel.date_published.desc()).offset(offset).limit(limit))
     all_blogs = result.scalars().all()
-    return all_blogs
+    return all_blogs , total

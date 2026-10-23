@@ -1,4 +1,4 @@
-from fastapi import APIRouter ,Depends , Request ,status
+from fastapi import APIRouter ,Depends , Request ,status , Query
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.staticfiles import StaticFiles
@@ -21,8 +21,8 @@ async def create_blog(blog:BlogSchema , db:AsyncSession = Depends(get_db) , user
 
 #Home section
 @blog_routes.get("/home")
-async def home(request:Request , db:AsyncSession = Depends(get_db)):
-    return await controllers.home(request , db)
+async def home(request:Request,page:int = Query(default=1 , ge=1), db:AsyncSession = Depends(get_db)):
+    return await controllers.home(request,page , db)
 
 
 # get a single blog
@@ -46,6 +46,7 @@ async def update_blog_partially(blog_id:int ,
     return await controllers.update_blog_partially(blog_id , blog ,user_id , db)
 
 
+
 #delete the blog
 @blog_routes.delete("/{blog_id}" , status_code=status.HTTP_204_NO_CONTENT)
 async def delete_blog(blog_id:int ,
@@ -54,13 +55,14 @@ async def delete_blog(blog_id:int ,
     return await controllers.delete_blog(blog_id ,user_id ,  db)
 
 
+
 #User posts page
 @blog_routes.get("/{user_id}/blogs")
-async def user_blog_page(request:Request , user_id:int , db:AsyncSession = Depends(get_db)):
-    return await controllers.user_blog_page(request ,user_id , db)
+async def user_blog_page(request:Request,user_id:int ,page:int = Query(default=1,ge=1), db:AsyncSession = Depends(get_db)):
+    return await controllers.user_blog_page(request,user_id ,page ,db)
 
 
 #get all the blogs
 @blog_routes.get("/api/all")
-async def get_all_blogs(request:Request ,db:AsyncSession = Depends(get_db)):
-    return await controllers.get_all_blogs(db)
+async def get_all_blogs(page:int = Query(default=1 , ge=1) ,db:AsyncSession = Depends(get_db)):
+    return await controllers.get_all_blogs(page , db)
