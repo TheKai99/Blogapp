@@ -4,6 +4,7 @@ from src.blogapp.routers import blog_routes
 from src.utils.db import Base , engine
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as starletteHTTPException
+from fastapi.exception_handlers import http_exception_handler as default_http_exception_handler
 from fastapi.templating import Jinja2Templates
 from src.user.routers import user_routes
 from contextlib import asynccontextmanager
@@ -37,14 +38,20 @@ app.include_router(user_routes , tags=["Users"])
 
 
 @app.exception_handler(starletteHTTPException)
-def http_exception_handler(request: Request, exc: starletteHTTPException):
+async def custom_http_exception_handler(request: Request, exc: starletteHTTPException):
+    accept = request.headers.get("accept", "")
 
+    # API clients / Swagger docs: return normal JSON {"detail": "..."}
+    if "text/html" not in accept:
+        return await default_http_exception_handler(request, exc)
+
+    # Browser pages: return the HTML error page
     return templates.TemplateResponse(
         request=request,
         name="error.html",
         context={
             "status_code": exc.status_code,
-            "detail": exc.detail
+            "detail": exc.detail,
         },
-        status_code=exc.status_code
+        status_code=exc.status_code,
     )

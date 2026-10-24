@@ -30,6 +30,11 @@ class UserUpdateSchema(BaseModel):
     email:EmailStr | None = Field(default=None , max_length=120)
     image_file:str | None = Field(default=None , min_length=1 , max_length=200)
 
+class ChangePassword(BaseModel):
+    current_pass:str
+    new_pass:str = Field(min_length=8 , max_length=12)
+    confirm_new_pass:str = Field(min_length=8 , max_length=12)
+
 
 
 

@@ -1,7 +1,9 @@
 from fastapi import APIRouter , Depends , status , Request , UploadFile
 from src.user import controllers
-from src.user.dtos import UserSchema , UserResponseSchema , UserUpdateSchema , UserLoginSchema
+from src.user.models import UserModel
+from src.user.dtos import UserSchema , UserResponseSchema , UserUpdateSchema , UserLoginSchema , ChangePassword
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from src.utils.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.templating import Jinja2Templates
@@ -76,3 +78,8 @@ async def update_profile_pic(file:UploadFile,
                              current_user = Depends(get_current_user_id),
                              db:AsyncSession = Depends(get_db)):
     return await controllers.update_profile_pic(file , current_user , db)
+
+
+@user_routes.post("/api/change-password")
+async def change_password(data:ChangePassword , current_user = Depends(get_current_user_id) , db:AsyncSession = Depends(get_db)):
+    return await controllers.change_password(data , current_user , db)

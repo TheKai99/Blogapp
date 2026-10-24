@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.user.models import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select , func
-from src.user.dtos import UserSchema , UserUpdateSchema , UserLoginSchema
+from src.user.dtos import UserSchema , UserUpdateSchema , UserLoginSchema , ChangePassword
 from src.utils.settings import settings
 from pwdlib import PasswordHash
 from fastapi.security import OAuth2PasswordRequestForm
@@ -24,6 +24,7 @@ hash_password = PasswordHash.recommended()
 
 def get_password_hash(password):
     return hash_password.hash(password)
+
 
 def verify_password(plain_password , hashed_password):
     return hash_password.verify(plain_password , hashed_password)
@@ -193,3 +194,32 @@ async def update_profile_pic(file , current_user , db):
         delete_profile_image(old_filename)
 
     return user
+
+
+async def change_password(data:ChangePassword , current_user , db):
+    result =await db.execute(select(UserModel).where(UserModel.id == current_user))
+    user = result.scalar_one_or_none()
+
+    user_data = data.model_dump()
+    user_current_pass = user_data["current_pass"]
+
+
+    if not verify_password(user_current_pass ,user.password_hash):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="your current pass is not correct")
+
+    new_pass = user_data["new_pass"]
+    confirm_pass = user_data["confirm_new_pass"]
+
+    if(new_pass != confirm_pass):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail="you new pass not equal to the confirm pass check it ")
+
+    new_hashed_pass = get_password_hash(confirm_pass)
+
+    user.password_hash = new_hashed_pass
+    await db.commit()
+    await db.refresh(user)
+
+    return "password changed successfully"
+
+
+
