@@ -70,8 +70,6 @@ async function loadcurrentuser() {
 
 
 
-
-
 // blog create button and model section
 const createBlogModal = document.getElementById("create-blog-modal");
 const createBlogButton = document.getElementById("create-blog-btn");

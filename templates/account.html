@@ -93,15 +93,56 @@
                 <p class="text-muted mb-0">
                     Keep your account secure.
                 </p>
+                <button type="button" id="change-password-btn" class="btn-solid theme-primary" data-bs-toggle="button"
+                    aria-pressed="false">Change Password</button>
             </div>
-
-            <span class="badge text-bg-secondary">Coming soon</span>
         </div>
-
-        <p class="mb-0">
-            Password management will be implemented later.
-        </p>
     </section>
+
+    <!--Change password modal-->
+
+    <div id="change-password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Change Your Password</h2>
+
+            <form class="change-password-form">
+                <div class="mb-3">
+                    <label for="current-password" class="form-label">
+                        Current Password
+                    </label>
+                    <input type="password" id="current-password" name="current_pass" class="form-control"
+                        placeholder="Enter current password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="new-password" class="form-label">
+                        New Password
+                    </label>
+                    <input type="password" id="new-password" name="new_pass" class="form-control"
+                        placeholder="Enter new password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirm-new-password" class="form-label">
+                        Confirm New Password
+                    </label>
+                    <input type="password" id="confirm-new-password" name="confirm_new_pass" class="form-control"
+                        placeholder="Confirm new password" required>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" id="close-change-password" class="btn btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        Change Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <!-- Logout -->
     <section class="account-card logout-card">
@@ -178,7 +219,7 @@
 
             const token = localStorage.getItem("access_token");
 
-            if(!token){
+            if (!token) {
                 window.location.href = '/user/login';
                 return;
             }
@@ -187,7 +228,7 @@
                 method: "PATCH",
                 headers: {
                     "content-type": "application/json",
-                    "Authorization":`Bearer ${token}`
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     username: newusername,
@@ -208,37 +249,37 @@
 
     const profilephotoform = document.querySelector(".profile-photo-form");
 
-    if(profilephotoform){
+    if (profilephotoform) {
 
-        profilephotoform.addEventListener("submit" , async function(event){
+        profilephotoform.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
-            const fileinput  = document.getElementById("profile-photo");
+            const fileinput = document.getElementById("profile-photo");
 
             const formdata = new FormData();
 
-            formdata.append("file" , fileinput.files[0]);
+            formdata.append("file", fileinput.files[0]);
 
             const token = localStorage.getItem("access_token");
 
-            if(!token){
+            if (!token) {
                 window.location.href = "/user/login";
                 return;
             }
 
 
-            const response = await fetch('/user/update_pic/',{
-                method:"PATCH",
-                headers:{
-                    "Authorization":`Bearer ${token}`
+            const response = await fetch('/user/update_pic/', {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer ${token}`
                 },
-                body:formdata
+                body: formdata
             });
 
-            if(response.ok){
+            if (response.ok) {
                 window.location.reload();
-            }else{
+            } else {
                 console.error("Failed:", response.status, await response.text());
             }
 
@@ -246,6 +287,76 @@
 
 
     }
+
+
+    const changePassBtn = document.getElementById("change-password-btn");
+    const chnagePassModal = document.getElementById("change-password-modal");
+
+    changePassBtn.addEventListener("click", function () {
+        chnagePassModal.style.display = "flex";
+    })
+
+    const closebtnpass = document.getElementById("close-change-password");
+
+    closebtnpass.addEventListener("click", function () {
+        chnagePassModal.style.display = "none";
+    })
+
+
+    chnagePassModal.addEventListener("click", function (event) {
+        if (event.target == chnagePassModal) {
+            chnagePassModal.style.display = "none";
+        }
+    })
+
+    const changepassForm = document.querySelector(".change-password-form");
+
+    changepassForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const current = document.getElementById("current-password").value;
+        const newpass = document.getElementById("new-password").value;
+        const confirmnewpass = document.getElementById("confirm-new-password").value;
+
+        token = localStorage.getItem("access_token");
+
+        if (!token) {
+            window.location.href = "/blog/home";
+            return;
+        }
+
+        const response = await fetch("/user/change-password", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                current_pass: current,
+                new_pass: newpass,
+                confirm_new_pass: confirmnewpass
+            })
+
+
+        });
+
+        if(response.ok){
+            window.location.reload();
+        }else{
+            console.error("failed" , response.status , await respons.text());
+        }
+
+    });
+
+
+
+
+
+
+
+
+
 
     AccountDetails();
 

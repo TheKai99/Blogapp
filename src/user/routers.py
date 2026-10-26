@@ -80,6 +80,6 @@ async def update_profile_pic(file:UploadFile,
     return await controllers.update_profile_pic(file , current_user , db)
 
 
-@user_routes.post("/api/change-password")
+@user_routes.post("/change-password")
 async def change_password(data:ChangePassword , current_user = Depends(get_current_user_id) , db:AsyncSession = Depends(get_db)):
     return await controllers.change_password(data , current_user , db)
